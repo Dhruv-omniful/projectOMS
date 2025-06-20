@@ -1,61 +1,50 @@
-package router
+package routes
 
 import (
-	"context"
+	"github.com/gin-gonic/gin"
 	"ims/controllers"
-
-	"github.com/omniful/go_commons/http"
-	
 )
 
-// Initialize sets up all API routes following REST conventions
-func Initialize(ctx context.Context, s *http.Server) (err error) {
-	apiV1 := s.Engine.Group("/api/v1")
+func RegisterRoutes(r *gin.Engine) {
+	// --- Tenants ---
+	r.POST("/tenants", controllers.CreateTenant)
+	r.GET("/tenants/:id", controllers.GetTenant)
+	r.PUT("/tenants/:id", controllers.UpdateTenant)
+	r.DELETE("/tenants/:id", controllers.DeleteTenant)
+	r.GET("/tenants", controllers.ListTenants)
 
-	// Hub routes
-	apiV1.POST("/hubs", controllers.CreateHub)
-	apiV1.GET("/hubs", controllers.GetAllHubs)
-	apiV1.GET("/hubs/:id", controllers.GetHub)
-	apiV1.PUT("/hubs/:id", controllers.UpdateHub)
-	apiV1.DELETE("/hubs/:id", controllers.DeleteHub)
+	// --- Sellers ---
+	r.POST("/sellers", controllers.CreateSeller)
+	r.GET("/sellers/:id", controllers.GetSeller)
+	r.PUT("/sellers/:id", controllers.UpdateSeller)
+	r.DELETE("/sellers/:id", controllers.DeleteSeller)
+	r.GET("/sellers", controllers.ListSellers)
 
-	// Inventory routes
-	apiV1.POST("/inventories", controllers.CreateInventory)
-	apiV1.GET("/inventories", controllers.GetAllInventories)
-	apiV1.GET("/inventories/:id", controllers.GetInventory)
-	apiV1.PUT("/inventories/:id", controllers.UpdateInventory)
-	apiV1.DELETE("/inventories/:id", controllers.DeleteInventory)
-	apiV1.GET("/inventories/validate/:id", controllers.CheckAndDecrementInventory)
+	// --- Hubs ---
+	r.POST("/hubs", controllers.CreateHub)
+	r.GET("/hubs/:id", controllers.GetHub)
+	r.PUT("/hubs/:id", controllers.UpdateHub)
+	r.DELETE("/hubs/:id", controllers.DeleteHub)
+	r.GET("/hubs", controllers.ListHubs)
 
-	// Seller routes
-	apiV1.POST("/sellers", controllers.CreateSeller)
-	apiV1.GET("/sellers", controllers.GetAllSellers)
-	apiV1.GET("/sellers/:id", controllers.GetSeller)
-	apiV1.PUT("/sellers/:id", controllers.UpdateSeller)
-	apiV1.DELETE("/sellers/:id", controllers.DeleteSeller)
+	// --- SKUs ---
+	r.POST("/skus", controllers.CreateSKU)
+	r.GET("/skus/:id", controllers.GetSKU)
+	r.PUT("/skus/:id", controllers.UpdateSKU)
+	r.DELETE("/skus/:id", controllers.DeleteSKU)
+	r.GET("/skus", controllers.ListSKUs)
 
-	// SKU routes
-	apiV1.POST("/skus", controllers.CreateSKU)
-	apiV1.GET("/skus", controllers.GetAllSKUs)
-	apiV1.GET("/skus/:id", controllers.GetSKU)
-	apiV1.PUT("/skus/:id", controllers.UpdateSKU)
-	apiV1.DELETE("/skus/:id", controllers.DeleteSKU)
-	apiV1.GET("/skus/byTenant/:id", controllers.FetchSKUsByTenant)
-	apiV1.GET("/skus/byHub/:id", controllers.FetchSKUsInHub)
-	apiV1.GET("/skus/validate/:id", controllers.ValidateSKU)
+	// --- Inventory ---
+	r.POST("/inventory", controllers.CreateInventory)
+	r.GET("/inventory/:id", controllers.GetInventory)
+	r.PUT("/inventory/:id", controllers.UpdateInventory)
+	r.DELETE("/inventory/:id", controllers.DeleteInventory)
+	r.GET("/inventory", controllers.ListInventory)
 
-	// Tenant routes
-	apiV1.POST("/tenants", controllers.CreateTenant)
-	apiV1.GET("/tenants", controllers.GetAllTenants)
-	apiV1.GET("/tenants/:id", controllers.GetTenant)
-	apiV1.PUT("/tenants/:id", controllers.UpdateTenant)
-	apiV1.DELETE("/tenants/:id", controllers.DeleteTenant)
-
-	// Webhook registration routes
-	apiV1.POST("/webhooks/register", controllers.RegisterWebhook)
-	apiV1.GET("/webhooks", controllers.GetAllWebhooks)
-	apiV1.DELETE("/webhooks/:id", controllers.DeleteWebhook)
-	apiV1.POST("/webhooks/trigger/:eventType", controllers.TriggerWebhook) // Optional: simulate webhook trigger
-
-	return nil
+	// --- Webhooks ---
+	r.POST("/webhooks", controllers.CreateWebhook)
+	r.GET("/webhooks/:id", controllers.GetWebhook)
+	r.PUT("/webhooks/:id", controllers.UpdateWebhook)
+	r.DELETE("/webhooks/:id", controllers.DeleteWebhook)
+	r.GET("/webhooks", controllers.ListWebhooks)
 }

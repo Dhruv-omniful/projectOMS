@@ -1,0 +1,60 @@
+# === SERVER CONFIG ===
+server:
+  port: 8080                  # OMS service port
+  read_timeout: 10s
+  write_timeout: 10s
+  idle_timeout: 70s
+
+# === LOGGING ===
+log:
+  level: "info"               # Can be: debug, info, warn, error
+
+# === ENVIRONMENT ===
+env: "local"                  # local | development | staging | production
+
+# === MONGODB ===
+mongodb:
+  uri: "mongodb://mongo:27017"
+  database: "oms_db"
+
+# === REDIS ===
+redis:
+  address: "redis:6379"
+  password: ""
+  db: 0
+
+# === KAFKA ===
+kafka:
+  brokers:
+    - "kafka:9092"
+  producer_topic: "order.created"
+  consumer_group: "oms-group"
+  consumer_topics:
+    - "order.created"
+
+# === S3 (LocalStack) ===
+s3:
+  bucket: "oms-bucket"
+  region: "us-east-1"
+  endpoint: "http://localhost:4566"
+
+# === SQS (LocalStack) ===
+sqs:
+  endpoint: "http://localhost:4566"                           # LocalStack SQS endpoint
+  region: "us-east-1"                                         # AWS region
+  queue_name: "CreateBulkOrder"
+  account: "000000000000"                               # Logical queue name
+  bulk_order_queue_url: "http://localhost:4566/000000000000/CreateBulkOrder"  # Full queue URL
+
+  consumer:
+    worker_count: 1                                           # Number of workers
+    concurrency_per_worker: 1                                 # Concurrency per worker
+    batch_size: 1                                             # Max messages per poll (SQS limit = 10)
+    visibility_timeout: 30                                    # Seconds to hide message during processing
+
+
+
+# === IMS SERVICE ===
+ims:
+  base_url: "http://ims:8081"   # Adjust as needed if IMS is dockerized
+  timeout: "5s"
