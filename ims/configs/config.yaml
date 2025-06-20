@@ -1,21 +1,32 @@
+server:
+  port: 8081
+  readTimeout: 10s
+  writeTimeout: 10s
+  idleTimeout: 30s
+
+log:
+  level: info
+
+env: local
+
 postgres:
-  master:
+  primary:
     host: "localhost"
-    port: "5432"
+    port: 5432
     username: "postgres"
     password: "root"
-    dbname: "ims_db"
-    max_open_conns: 10
-    max_idle_conns: 5
-    conn_max_lifetime: "30m"
-    debug_mode: true
-  slaves:
-    - host: "slave1-host"
-      port: "5432"
-      username: "postgres"
-      password: "yourpassword"
-      dbname: "ims_db"
-      max_open_conns: 10
-      max_idle_conns: 5
-      conn_max_lifetime: "30m"
-      debug_mode: false
+    database: "ims_db"
+    debug_mode: false
+    prepare_stmt: false
+    skip_default_transaction: false
+
+  replicas: []
+
+  pool:
+    max_open_conns: 50
+    max_idle_conns: 10
+    conn_max_lifetime: 1h
+
+redis:
+  endpoint: "localhost:6379"
+  db: 0
