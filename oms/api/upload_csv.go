@@ -9,7 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/gin-gonic/gin"
 	"github.com/omniful/go_commons/log"
-	gooms3 "github.com/omniful/go_commons/s3"
+	// gooms3 "github.com/omniful/go_commons/s3"
 )
 
 func (h *Handlers) UploadLocalCSVs(c *gin.Context) {
@@ -30,12 +30,8 @@ func (h *Handlers) UploadLocalCSVs(c *gin.Context) {
 	}
 
 	// 3) Init GoCommons S3 client
-	s3Client, err := gooms3.NewDefaultAWSS3Client()
-	if err != nil {
-		log.Errorf("❌ S3 client init failed: %v", err)
-		c.JSON(500, gin.H{"error": "S3 client init failed"})
-		return
-	}
+	s3Client := h.OrderService.S3.Client
+
 
 	bucket := h.OrderService.S3.Bucket
 	var uploaded []string
@@ -53,6 +49,8 @@ func (h *Handlers) UploadLocalCSVs(c *gin.Context) {
 			continue
 		}
 		defer f.Close()
+		log.Infof("🔼 Uploading file: local=%s → s3_key=%s", filePath, key)
+		log.Infof("📦 Uploading to bucket: %s", bucket)
 
 		// Upload to S3
 		_, err = s3Client.PutObject(c.Request.Context(), &s3.PutObjectInput{

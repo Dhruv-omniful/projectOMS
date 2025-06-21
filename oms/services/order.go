@@ -4,13 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/omniful/go_commons/config"
 	"github.com/omniful/go_commons/log"
 
 	"github.com/dhruv/oms/client"
-	"github.com/dhruv/oms/model"
 )
 
 // OrderService handles order-related logic
@@ -42,26 +41,23 @@ func (s *OrderService) ProcessCSV(ctx context.Context, s3Path string) error {
 
 	log.Infof("✅ S3 file exists: %s", s3Path)
 
-	// Build CreateBulkOrderEvent
-	event := model.CreateBulkOrderEvent{
-		S3Path:     s3Path,
-		TenantID:   "tenant-123", // Replace with real tenant ID if available
-		UploadedAt: time.Now().Format(time.RFC3339),
+	// ✅ Create payload that CSV worker expects
+	payload := map[string]string{
+		"Bucket": config.GetString(ctx, "s3.bucket"),
+		"Key":    s3Path,
 	}
 
-	payload, err := json.Marshal(event)
+	data, err := json.Marshal(payload)
 	if err != nil {
-		log.Errorf("❌ Failed to marshal CreateBulkOrderEvent: %v", err)
-		return fmt.Errorf("failed to marshal event: %w", err)
+		log.Errorf("❌ Failed to marshal SQS payload: %v", err)
+		return fmt.Errorf("failed to marshal payload: %w", err)
 	}
 
-	// Publish event to SQS
-	if err := s.SQSClient.PublishCreateBulkOrderEvent(ctx, payload); err != nil {
-		log.Errorf("❌ Failed to publish CreateBulkOrderEvent: %v", err)
-		return fmt.Errorf("failed to publish SQS event: %w", err)
+	if err := s.SQSClient.PublishCreateBulkOrderEvent(ctx, data); err != nil {
+		log.Errorf("❌ Failed to publish SQS event: %v", err)
+		return fmt.Errorf("failed to publish event to SQS: %w", err)
 	}
 
-	log.Infof("✅ CreateBulkOrderEvent published to SQS")
-
+	log.Infof("✅ CreateBulkOrderEvent published to SQS: %v", payload)
 	return nil
 }

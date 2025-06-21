@@ -13,6 +13,8 @@ import (
 	"github.com/dhruv/oms/api"
 	"github.com/dhruv/oms/client"
 	"github.com/dhruv/oms/services"
+	"github.com/dhruv/oms/worker"
+
 )
 
 func main() {
@@ -56,6 +58,9 @@ fmt.Println("LOCAL_SQS_ENDPOINT:", os.Getenv("LOCAL_SQS_ENDPOINT"))
 	// === HANDLERS ===
 	handlers := api.NewHandlers(orderService)
 
+	// === START WORKER ===
+	go worker.StartCSVProcessor(ctx)
+
 	// === SERVER SETUP ===
 	port := ":" + strconv.Itoa(config.GetInt(ctx, "server.port"))
 	srv := http.InitializeServer(
@@ -72,12 +77,12 @@ fmt.Println("LOCAL_SQS_ENDPOINT:", os.Getenv("LOCAL_SQS_ENDPOINT"))
 	srv.Engine.GET("/health", health.HealthcheckHandler())
 	api.RegisterRoutes(srv.Engine, handlers)
 	
-	testPayload := []byte(`{"order_id": "1234", "status": "created"}`)
-if err := sqsClient.PublishCreateBulkOrderEvent(ctx, testPayload); err != nil {
-	log.Errorf("❌ Failed to publish test message: %v", err)
-} else {
-	log.Infof("✅ Test message published to SQS")
-}
+// 	testPayload := []byte(`{"order_id": "1234", "status": "created"}`)
+// if err := sqsClient.PublishCreateBulkOrderEvent(ctx, testPayload); err != nil {
+// 	log.Errorf("❌ Failed to publish test message: %v", err)
+// } else {
+// 	log.Infof("✅ Test message published to SQS")
+// }
 
 	// === START SERVER ===
 	if err := srv.StartServer("oms-service"); err != nil {
