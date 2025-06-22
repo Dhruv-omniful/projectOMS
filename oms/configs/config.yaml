@@ -14,7 +14,7 @@ env: "local"                  # local | development | staging | production
 
 # === MONGODB ===
 mongodb:
-  uri: "mongodb://mongo:27017"
+  uri: "mongodb://localhost:27017/oms_db"
   database: "oms_db"
 
 # === REDIS ===
@@ -43,7 +43,7 @@ sqs:
   endpoint: "http://localhost:4566"                           # LocalStack SQS endpoint
   region: "us-east-1"                                         # AWS region
   queue_name: "CreateBulkOrder"
-  account: "000000000000"                               # Logical queue name
+  account: "000000000000"                             
   bulk_order_queue_url: "http://localhost:4566/000000000000/CreateBulkOrder"  # Full queue URL
 
   consumer:
