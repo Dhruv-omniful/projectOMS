@@ -108,6 +108,7 @@ if err != nil {
 			}
 
 			logger.Infof("✅ Order processed: %+v", order)
+			client.PublishOrderCreated(ctx, order)
 		}
 
 		if len(invalid) > 0 {

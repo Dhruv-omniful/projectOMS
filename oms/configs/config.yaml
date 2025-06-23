@@ -26,11 +26,12 @@ redis:
 # === KAFKA ===
 kafka:
   brokers:
-    - "kafka:9092"
+    - "localhost:9092"
   producer_topic: "order.created"
   consumer_group: "oms-group"
   consumer_topics:
     - "order.created"
+  version: "2.8.0"
 
 # === S3 (LocalStack) ===
 s3:

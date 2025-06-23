@@ -52,6 +52,14 @@ fmt.Println("LOCAL_SQS_ENDPOINT:", os.Getenv("LOCAL_SQS_ENDPOINT"))
 	}
 	log.Info("✅ SQS client initialized successfully")
 
+	// === KAFKA PRODUCER ===
+	client.InitKafkaProducer(ctx)
+	log.Info("✅ Kafka producer initialized successfully")
+
+	// === KAFKA CONSUMER (Order Finalizer Worker) ===
+	go worker.StartOrderFinalizer(ctx)
+
+
 	// === ORDER SERVICE ===
 	orderService := service.NewOrderService(s3Client, sqsClient)
 
