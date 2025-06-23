@@ -52,6 +52,14 @@ fmt.Println("LOCAL_SQS_ENDPOINT:", os.Getenv("LOCAL_SQS_ENDPOINT"))
 	}
 	log.Info("✅ SQS client initialized successfully")
 
+	// === KAFKA PRODUCER ===
+	client.InitKafkaProducer(ctx)
+	log.Info("✅ Kafka producer initialized successfully")
+
+	// === KAFKA CONSUMER (Order Finalizer Worker) ===
+	go worker.StartOrderFinalizer(ctx)
+
+
 	// === ORDER SERVICE ===
 	orderService := service.NewOrderService(s3Client, sqsClient)
 
@@ -76,13 +84,6 @@ fmt.Println("LOCAL_SQS_ENDPOINT:", os.Getenv("LOCAL_SQS_ENDPOINT"))
 	// === ROUTES ===
 	srv.Engine.GET("/health", health.HealthcheckHandler())
 	api.RegisterRoutes(srv.Engine, handlers)
-	
-// 	testPayload := []byte(`{"order_id": "1234", "status": "created"}`)
-// if err := sqsClient.PublishCreateBulkOrderEvent(ctx, testPayload); err != nil {
-// 	log.Errorf("❌ Failed to publish test message: %v", err)
-// } else {
-// 	log.Infof("✅ Test message published to SQS")
-// }
 
 	// === START SERVER ===
 	if err := srv.StartServer("oms-service"); err != nil {

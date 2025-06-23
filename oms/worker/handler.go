@@ -102,12 +102,13 @@ if err != nil {
 				Quantity: int64(qty),
 			}
 
-			if err := saveOrder(ctx, order); err != nil {
+			if err := client.SaveOrder(ctx, order); err != nil {
 				invalid = append(invalid, row)
 				continue
 			}
 
 			logger.Infof("✅ Order processed: %+v", order)
+			client.PublishOrderCreated(ctx, order)
 		}
 
 		if len(invalid) > 0 {
@@ -131,10 +132,5 @@ if err != nil {
 		}
 	}
 
-	return nil
-}
-
-func saveOrder(ctx context.Context, order *model.Order) error {
-	log.DefaultLogger().Infof("💾 [Mock] Saving order to DB: %+v", order)
 	return nil
 }
