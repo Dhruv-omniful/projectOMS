@@ -116,3 +116,18 @@ func ListHubs(c *gin.Context) {
 
 	c.JSON(http.StatusOK, hubs)
 }
+
+// GetHubByCode handles GET /hubs/code/:hub_code
+func GetHubByCode(c *gin.Context) {
+	hubCode := c.Param("hub_code")
+	var hub model.Hub
+
+	db := pr.DB.GetSlaveDB(c.Request.Context())
+	if err := db.Where("hub_code = ?", hubCode).First(&hub).Error; err != nil {
+		log.DefaultLogger().Errorf("GetHubByCode DB error: %v", err)
+		c.JSON(http.StatusNotFound, gin.H{"error": i18n.Translate(c, "error.hub_not_found")})
+		return
+	}
+
+	c.JSON(http.StatusOK, hub)
+}

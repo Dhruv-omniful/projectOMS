@@ -103,3 +103,17 @@ func ListSKUs(c *gin.Context) {
 
 	c.JSON(http.StatusOK, skus)
 }
+
+func GetSKUByCode(c *gin.Context) {
+	skuCode := c.Param("sku_code")
+	var sku model.SKU
+
+	db := pr.DB.GetSlaveDB(c.Request.Context())
+	if err := db.Where("sku_code = ?", skuCode).First(&sku).Error; err != nil {
+		log.DefaultLogger().Errorf("GetSKUByCode DB error: %v", err)
+		c.JSON(http.StatusNotFound, gin.H{"error": i18n.Translate(c, "error.sku_not_found")})
+		return
+	}
+
+	c.JSON(http.StatusOK, sku)
+}

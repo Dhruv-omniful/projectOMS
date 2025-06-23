@@ -1,8 +1,9 @@
 package routes
 
 import (
-	"github.com/gin-gonic/gin"
 	"ims/controllers"
+
+	"github.com/gin-gonic/gin"
 )
 
 func RegisterRoutes(r *gin.Engine) {
@@ -26,6 +27,7 @@ func RegisterRoutes(r *gin.Engine) {
 	r.PUT("/hubs/:id", controllers.UpdateHub)
 	r.DELETE("/hubs/:id", controllers.DeleteHub)
 	r.GET("/hubs", controllers.ListHubs)
+	r.GET("/hubs/code/:hub_code", controllers.GetHubByCode)
 
 	// --- SKUs ---
 	r.POST("/skus", controllers.CreateSKU)
@@ -33,6 +35,7 @@ func RegisterRoutes(r *gin.Engine) {
 	r.PUT("/skus/:id", controllers.UpdateSKU)
 	r.DELETE("/skus/:id", controllers.DeleteSKU)
 	r.GET("/skus", controllers.ListSKUs)
+	r.GET("/skus/code/:sku_code", controllers.GetSKUByCode)
 
 	r.POST("/inventory", controllers.CreateInventory)
 	r.GET("/inventory/:id", controllers.GetInventory)
