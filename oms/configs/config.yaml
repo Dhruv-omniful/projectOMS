@@ -57,5 +57,5 @@ sqs:
 
 # === IMS SERVICE ===
 ims:
-  base_url: "http://ims:8081"   # Adjust as needed if IMS is dockerized
+  base_url: "http://localhost:8081"   # Adjust as needed if IMS is dockerized
   timeout: "5s"

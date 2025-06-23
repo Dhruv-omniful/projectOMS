@@ -4,12 +4,13 @@ import (
 	"net/http"
 	"time"
 
+	"ims/model"
+	pr "ims/postgres"
+
 	"github.com/gin-gonic/gin"
 	"github.com/omniful/go_commons/i18n"
 	"github.com/omniful/go_commons/log"
-
-	"ims/model"
-	"ims/postgres"
+	"gorm.io/gorm/clause"
 )
 
 // CreateInventory handles POST /inventory (upsert logic can be added if needed)
@@ -100,4 +101,81 @@ func ListInventory(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, inventories)
+}
+
+// QueryInventory handles GET /inventory/query?tenant_id=...&seller_id=...&hub_code=...&sku_code=...
+func QueryInventory(c *gin.Context) {
+	tenantID := c.Query("tenant_id")
+	sellerID := c.Query("seller_id")
+	hubCode := c.Query("hub_code")
+	skuCode := c.Query("sku_code")
+
+	if tenantID == "" || sellerID == "" || hubCode == "" || skuCode == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing required query params"})
+		return
+	}
+
+	var inventory model.Inventory
+	db := pr.DB.GetSlaveDB(c.Request.Context())
+	if err := db.Where("tenant_id = ? AND seller_id = ? AND hub_code = ? AND sku_code = ?", tenantID, sellerID, hubCode, skuCode).
+		First(&inventory).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Inventory not found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, inventory)
+}
+
+// ConsumeInventory handles POST /inventory/consume
+func ConsumeInventory(c *gin.Context) {
+	var req struct {
+		TenantID string `json:"tenant_id"`
+		SellerID string `json:"seller_id"`
+		HubCode  string `json:"hub_code"`
+		SKUCode  string `json:"sku_code"`
+		Quantity int64  `json:"quantity"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+		return
+	}
+
+	db := pr.DB.GetMasterDB(c.Request.Context())
+
+	var inventory model.Inventory
+	// Lock row for update
+	if err := db.Clauses(clause.Locking{Strength: "UPDATE"}).
+		Where("tenant_id = ? AND seller_id = ? AND hub_code = ? AND sku_code = ?", req.TenantID, req.SellerID, req.HubCode, req.SKUCode).
+		First(&inventory).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Inventory not found"})
+		return
+	}
+
+	log.Infof("🔍 Fetched inventory before update: %+v", inventory)
+
+	if inventory.Quantity < req.Quantity {
+		c.JSON(http.StatusConflict, gin.H{"error": "Insufficient inventory"})
+		return
+	}
+
+	newQty := inventory.Quantity - req.Quantity
+	updatedAt := time.Now().UTC()
+
+	// Use Updates instead of Save for reliability
+	if err := db.Model(&inventory).
+		Where("id = ?", inventory.ID).
+		Updates(map[string]interface{}{
+			"quantity":   newQty,
+			"updated_at": updatedAt,
+		}).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update inventory"})
+		return
+	}
+
+	log.Infof("✅ Inventory updated: ID=%d New Quantity=%d", inventory.ID, newQty)
+
+	c.JSON(http.StatusOK, gin.H{
+		"message":   "Inventory consumed",
+		"remaining": newQty,
+	})
 }

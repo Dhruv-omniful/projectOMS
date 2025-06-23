@@ -24,8 +24,8 @@ type OrderCreated struct {
 	OrderID   string    `json:"order_id"`
 	TenantID  string    `json:"tenant_id"`
 	SellerID  string    `json:"seller_id"`
-	HubID     string    `json:"hub_id"`
-	SKUID     string    `json:"sku_id"`
+	HubCode     string    `json:"hub_id"`
+	SKUCode    string    `json:"sku_id"`
 	Quantity  int64     `json:"quantity"`
 	CreatedAt time.Time `json:"created_at"`
 }

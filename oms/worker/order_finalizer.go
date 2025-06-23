@@ -10,7 +10,7 @@ import (
 	"github.com/omniful/go_commons/log"
 	"github.com/omniful/go_commons/pubsub"
 
-	// "github.com/dhruv/oms/client"
+	"github.com/dhruv/oms/client"
 	"github.com/dhruv/oms/model"
 )
 
@@ -23,24 +23,61 @@ func (h *OrderCreatedHandler) Process(ctx context.Context, msg *pubsub.Message) 
 		return err
 	}
 
-	log.DefaultLogger().Infof("📥 Processing order.created for OrderID: %s", event.OrderID)
+	logger := log.DefaultLogger()
+	logger.Infof("📥 Processing order.created for OrderID: %s", event.OrderID)
 
-	// Example: Check inventory, update Mongo, etc.
-	// if err := client.CheckAndUpdateOrder(ctx, &event); err != nil {
-	// 	log.DefaultLogger().Errorf("❌ Failed to finalize order: %v", err)
-	// 	return err
-	// }
+	baseURL := config.GetString(ctx, "ims.base_url")
+	timeout := config.GetDuration(ctx, "ims.timeout")
 
-	log.DefaultLogger().Infof("✅ Finalized order: %s", event.OrderID)
+	ctxWithTimeout, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
+
+	// Call IMS to check inventory
+	inventory, err := client.FetchInventory(ctxWithTimeout, baseURL, event.TenantID, event.SellerID, event.HubCode, event.SKUCode)
+	if err != nil {
+		logger.Errorf("❌ IMS fetch inventory failed: %v", err)
+		return err
+	}
+
+	if inventory.Quantity >= event.Quantity {
+		// Reduce inventory
+		if err := client.ConsumeInventory(ctxWithTimeout, baseURL, event.TenantID, event.SellerID, event.HubCode, event.SKUCode, event.Quantity); err != nil {
+			logger.Errorf("❌ IMS consume inventory failed: %v", err)
+			return err
+		}
+
+		// Update order status to new_order
+		if err := client.UpdateOrderStatus(ctxWithTimeout, baseURL, client.UpdateOrderStatusRequest{
+			OrderID: event.OrderID,
+			Status:  "new_order",
+		}); err != nil {
+			logger.Errorf("❌ Failed to update order status: %v", err)
+			return err
+		}
+		logger.Infof("✅ Order %s finalized as new_order", event.OrderID)
+	} else {
+		// Not enough stock, keep on_hold
+		if err := client.UpdateOrderStatus(ctxWithTimeout, baseURL, client.UpdateOrderStatusRequest{
+			OrderID: event.OrderID,
+			Status:  "on_hold",
+		}); err != nil {
+			logger.Errorf("❌ Failed to update order status: %v", err)
+			return err
+		}
+		logger.Warnf("⚠️ Order %s kept on_hold due to insufficient inventory", event.OrderID)
+	}
+
 	return nil
 }
 
 func StartOrderFinalizer(ctx context.Context) {
 	brokers := config.GetStringSlice(ctx, "kafka.brokers")
 	groupID := config.GetString(ctx, "kafka.consumer_group")
-	version := config.GetString(ctx, "kafka.version") // Add in config.yaml
+	version := config.GetString(ctx, "kafka.version")
 	clientID := config.GetString(ctx, "kafka.producer_topic")
+
 	log.DefaultLogger().Infof("Kafka config: brokers=%v version=%s", brokers, version)
+
 	consumer := kafka.NewConsumer(
 		kafka.WithBrokers(brokers),
 		kafka.WithConsumerGroup(groupID),
@@ -48,12 +85,9 @@ func StartOrderFinalizer(ctx context.Context) {
 		kafka.WithKafkaVersion(version),
 		kafka.WithRetryInterval(time.Second),
 	)
+
 	log.DefaultLogger().Infof("✅ Consumer subscribing to topic: order.created")
 
-	// Optional: Add interceptor if needed (e.g. NewRelic)
-	// consumer.SetInterceptor(interceptor.NewRelicInterceptor())
-
-	// Register handler
 	handler := &OrderCreatedHandler{}
 	consumer.RegisterHandler("order.created", handler)
 
