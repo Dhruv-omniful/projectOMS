@@ -34,12 +34,13 @@ func RegisterRoutes(r *gin.Engine) {
 	r.DELETE("/skus/:id", controllers.DeleteSKU)
 	r.GET("/skus", controllers.ListSKUs)
 
-	// --- Inventory ---
 	r.POST("/inventory", controllers.CreateInventory)
 	r.GET("/inventory/:id", controllers.GetInventory)
 	r.PUT("/inventory/:id", controllers.UpdateInventory)
 	r.DELETE("/inventory/:id", controllers.DeleteInventory)
 	r.GET("/inventory", controllers.ListInventory)
+	r.GET("/inventory/query", controllers.QueryInventory)      // new
+	r.POST("/inventory/consume", controllers.ConsumeInventory) // new
 
 	// --- Webhooks ---
 	r.POST("/webhooks", controllers.CreateWebhook)

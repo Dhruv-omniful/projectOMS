@@ -11,3 +11,7 @@ type Inventory struct {
 	Quantity  int64     `gorm:"default:0" json:"quantity"`
 	UpdatedAt time.Time `gorm:"autoUpdateTime" json:"updated_at"`
 }
+
+func (Inventory) TableName() string {
+	return "inventory"
+}

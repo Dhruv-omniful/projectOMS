@@ -38,8 +38,8 @@ func PublishOrderCreated(ctx context.Context, o *model.Order) {
 		OrderID:   o.ID,
 		TenantID:  o.TenantID,
 		SellerID:  o.SellerID,
-		HubID:     o.HubID,
-		SKUID:     o.SKUID,
+		HubCode:     o.HubID,
+		SKUCode:     o.SKUID,
 		Quantity:  o.Quantity,
 		CreatedAt: o.CreatedAt,
 	}
