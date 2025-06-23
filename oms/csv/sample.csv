@@ -1,4 +1,4 @@
 tenant_id,seller_id,hub_id,sku_id,quantity
 t1,s1,H2,SKUU-001,1
 t1,s1,H2,SKUU-001,1
-
+t3,s2,H20,SKUU-001,1

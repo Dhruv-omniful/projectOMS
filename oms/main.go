@@ -71,7 +71,7 @@ func main() {
 	// 	log.Panicf("❌ Failed to init IMS HTTP client: %v", err)
 	// }
 
-	imsClient := client.NewIMSClient()
+	imsClient := client.NewIMSClient(config.GetString(ctx, "ims.base_url"))
 
 	log.Info("✅ IMS client initialized successfully")
 
