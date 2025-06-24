@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/omniful/go_commons/config"
 	"github.com/omniful/go_commons/log"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
@@ -65,4 +66,48 @@ func SaveOrder(ctx context.Context, o *model.Order) error {
 
 	mongoLogger.Infof("✅ Order saved: %+v", o)
 	return nil
+}
+
+func GetWebhooksCollection(ctx context.Context) (*mongo.Collection, error) {
+	client, err := GetMongoClient(ctx)
+	if err != nil {
+		return nil, err
+	}
+	dbName := config.GetString(ctx, "mongodb.database")
+	return client.Database(dbName).Collection("webhooks"), nil
+}
+
+func SaveWebhook(ctx context.Context, wh *model.Webhook) error {
+	coll, err := GetWebhooksCollection(ctx)
+	if err != nil {
+		return err
+	}
+	wh.ID = uuid.NewString()
+	wh.CreatedAt = time.Now().UTC()
+	wh.UpdatedAt = time.Now().UTC()
+	wh.IsActive = true // default to active on save
+	_, err = coll.InsertOne(ctx, wh)
+	return err
+}
+
+func GetWebhooksForTenantAndEvent(ctx context.Context, tenantID, event string) ([]model.Webhook, error) {
+	coll, err := GetWebhooksCollection(ctx)
+	if err != nil {
+		return nil, err
+	}
+	filter := bson.M{
+		"tenant_id": tenantID,
+		"events": bson.M{
+			"$in": []string{event},
+		},
+	}
+	cursor, err := coll.Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+	var webhooks []model.Webhook
+	if err := cursor.All(ctx, &webhooks); err != nil {
+		return nil, err
+	}
+	return webhooks, nil
 }

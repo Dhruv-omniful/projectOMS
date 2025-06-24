@@ -166,6 +166,8 @@ func (h *queueHandler) Process(ctx context.Context, msgs *[]sqs.Message) (err er
 			}
 			logger.Infof("✅ Order processed at row %d: %+v", rowNum+1, order)
 			client.PublishOrderCreated(ctx, order)
+
+			client.NotifyWebhooks(ctx, order.TenantID, "order.created", order)
 		}
 
 		if len(invalid) > 0 {
