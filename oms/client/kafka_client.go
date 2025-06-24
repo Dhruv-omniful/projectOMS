@@ -30,7 +30,7 @@ func InitKafkaProducer(ctx context.Context) {
 		kafka.WithKafkaVersion(version),  // 👉 This is crucial
 	)
 
-	kafkaLogger.Infof("✅ Kafka producer initialized with brokers: %v, version: %s", brokers, version)
+	kafkaLogger.Infof(" Kafka producer initialized with brokers: %v, version: %s", brokers, version)
 }
 
 func PublishOrderCreated(ctx context.Context, o *model.Order) {
@@ -43,7 +43,7 @@ func PublishOrderCreated(ctx context.Context, o *model.Order) {
 		Quantity:  o.Quantity,
 		CreatedAt: o.CreatedAt,
 	}
-	kafkaLogger.Infof("✅ Producer topic: %s", config.GetString(ctx, "kafka.producer_topic"))
+	kafkaLogger.Infof(" Producer topic: %s", config.GetString(ctx, "kafka.producer_topic"))
 
 	payload, err := pubsub.NewEventInBytes(event)
 
@@ -57,12 +57,12 @@ func PublishOrderCreated(ctx context.Context, o *model.Order) {
 		Key:   o.ID,
 		Value: payload,
 	}
-	kafkaLogger.Infof("👉 About to publish to Kafka: topic=%s, key=%s, payload=%s", 
+	kafkaLogger.Infof(" About to publish to Kafka: topic=%s, key=%s, payload=%s", 
 	msg.Topic, msg.Key, string(msg.Value))
 
 	if err := producer.Publish(ctx, msg); err != nil {
 		kafkaLogger.Errorf("❌ Kafka publish error: %v", err)
 	} else {
-		kafkaLogger.Infof("✅ Published order.created for OrderID: %s", o.ID)
+		kafkaLogger.Infof(" Published order.created for OrderID: %s", o.ID)
 	}
 }

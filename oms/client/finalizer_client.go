@@ -123,15 +123,15 @@ func UpdateOrderStatus(ctx context.Context, _ string, req UpdateOrderStatusReque
 
 	result, err := coll.UpdateOne(ctx, filter, update)
 	if err != nil {
-		logger.Errorf("❌ Failed to update order status: %v", err)
+		logger.Errorf(" Failed to update order status: %v", err)
 		return fmt.Errorf("update error: %w", err)
 	}
 
 	if result.MatchedCount == 0 {
-		logger.Warnf("⚠️ No order found with ID %s to update", req.OrderID)
+		logger.Warnf(" No order found with ID %s to update", req.OrderID)
 		return fmt.Errorf("no order found with ID %s", req.OrderID)
 	}
 
-	logger.Infof("✅ Updated order status: OrderID=%s Status=%s", req.OrderID, req.Status)
+	logger.Infof(" Updated order status: OrderID=%s Status=%s", req.OrderID, req.Status)
 	return nil
 }
