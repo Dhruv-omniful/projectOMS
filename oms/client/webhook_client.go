@@ -14,12 +14,12 @@ import (
 func NotifyWebhooks(ctx context.Context, tenantID, eventType string, payload interface{}) {
 	webhooks, err := GetWebhooksForTenantAndEvent(ctx, tenantID, eventType)
 	if err != nil {
-		log.DefaultLogger().Errorf("❌ Failed to fetch webhooks: %v", err)
+		log.DefaultLogger().Errorf(" Failed to fetch webhooks: %v", err)
 		return
 	}
 
 	if len(webhooks) == 0 {
-		log.DefaultLogger().Infof("⚠️ No webhooks registered for tenant=%s event=%s", tenantID, eventType)
+		log.DefaultLogger().Infof(" No webhooks registered for tenant=%s event=%s", tenantID, eventType)
 		return
 	}
 
@@ -29,7 +29,7 @@ func NotifyWebhooks(ctx context.Context, tenantID, eventType string, payload int
 		"data":      payload,
 	})
 	if err != nil {
-		log.DefaultLogger().Errorf("❌ Failed to marshal webhook payload: %v", err)
+		log.DefaultLogger().Errorf(" Failed to marshal webhook payload: %v", err)
 		return
 	}
 
@@ -45,7 +45,7 @@ func NotifyWebhooks(ctx context.Context, tenantID, eventType string, payload int
 func sendWebhookRequest(ctx context.Context, wh model.Webhook, body []byte) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, wh.CallbackURL, bytes.NewReader(body))
 	if err != nil {
-		log.DefaultLogger().Errorf("❌ Failed to create webhook request for %s: %v", wh.CallbackURL, err)
+		log.DefaultLogger().Errorf(" Failed to create webhook request for %s: %v", wh.CallbackURL, err)
 		return
 	}
 	req.Header.Set("Content-Type", "application/json")
@@ -57,10 +57,10 @@ func sendWebhookRequest(ctx context.Context, wh model.Webhook, body []byte) {
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		log.DefaultLogger().Errorf("❌ Webhook POST failed to %s: %v", wh.CallbackURL, err)
+		log.DefaultLogger().Errorf(" Webhook POST failed to %s: %v", wh.CallbackURL, err)
 		return
 	}
 	defer resp.Body.Close()
 
-	log.DefaultLogger().Infof("✅ Webhook sent to %s: status=%d", wh.CallbackURL, resp.StatusCode)
+	log.DefaultLogger().Infof(" Webhook sent to %s: status=%d", wh.CallbackURL, resp.StatusCode)
 }

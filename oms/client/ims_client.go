@@ -22,13 +22,13 @@ func (c *IMSClient) CheckSKU(ctx context.Context, skuCode string) bool {
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
-		log.DefaultLogger().Errorf("❌ CheckSKU request error: %v", err)
+		log.DefaultLogger().Errorf(" CheckSKU request error: %v", err)
 		return false
 	}
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		log.DefaultLogger().Errorf("❌ CheckSKU HTTP error: %v", err)
+		log.DefaultLogger().Errorf(" CheckSKU HTTP error: %v", err)
 		return false
 	}
 	defer resp.Body.Close()
@@ -42,13 +42,13 @@ func (c *IMSClient) CheckHub(ctx context.Context, hubCode string) bool {
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
-		log.DefaultLogger().Errorf("❌ CheckHub request error: %v", err)
+		log.DefaultLogger().Errorf(" CheckHub request error: %v", err)
 		return false
 	}
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		log.DefaultLogger().Errorf("❌ CheckHub HTTP error: %v", err)
+		log.DefaultLogger().Errorf(" CheckHub HTTP error: %v", err)
 		return false
 	}
 	defer resp.Body.Close()

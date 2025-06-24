@@ -21,16 +21,16 @@ func InitKafkaProducer(ctx context.Context) {
 	version := config.GetString(ctx, "kafka.version")
 
 	if version == "" {
-		log.Panicf("❌ Kafka version is missing in config")
+		log.Panicf(" Kafka version is missing in config")
 	}
 
 	producer = kafka.NewProducer(
 		kafka.WithBrokers(brokers),
 		kafka.WithClientID("oms-producer"),
-		kafka.WithKafkaVersion(version),  // 👉 This is crucial
+		kafka.WithKafkaVersion(version),  
 	)
 
-	kafkaLogger.Infof("✅ Kafka producer initialized with brokers: %v, version: %s", brokers, version)
+	kafkaLogger.Infof(" Kafka producer initialized with brokers: %v, version: %s", brokers, version)
 }
 
 func PublishOrderCreated(ctx context.Context, o *model.Order) {
@@ -43,12 +43,12 @@ func PublishOrderCreated(ctx context.Context, o *model.Order) {
 		Quantity:  o.Quantity,
 		CreatedAt: o.CreatedAt,
 	}
-	kafkaLogger.Infof("✅ Producer topic: %s", config.GetString(ctx, "kafka.producer_topic"))
+	kafkaLogger.Infof(" Producer topic: %s", config.GetString(ctx, "kafka.producer_topic"))
 
 	payload, err := pubsub.NewEventInBytes(event)
 
 	if err != nil {
-		kafkaLogger.Errorf("❌ Failed to marshal OrderCreated: %v", err)
+		kafkaLogger.Errorf(" Failed to marshal OrderCreated: %v", err)
 		return
 	}
 
@@ -57,12 +57,12 @@ func PublishOrderCreated(ctx context.Context, o *model.Order) {
 		Key:   o.ID,
 		Value: payload,
 	}
-	kafkaLogger.Infof("👉 About to publish to Kafka: topic=%s, key=%s, payload=%s", 
+	kafkaLogger.Infof(" About to publish to Kafka: topic=%s, key=%s, payload=%s", 
 	msg.Topic, msg.Key, string(msg.Value))
 
 	if err := producer.Publish(ctx, msg); err != nil {
-		kafkaLogger.Errorf("❌ Kafka publish error: %v", err)
+		kafkaLogger.Errorf(" Kafka publish error: %v", err)
 	} else {
-		kafkaLogger.Infof("✅ Published order.created for OrderID: %s", o.ID)
+		kafkaLogger.Infof(" Published order.created for OrderID: %s", o.ID)
 	}
 }

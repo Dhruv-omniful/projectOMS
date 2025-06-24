@@ -42,8 +42,8 @@ func RegisterRoutes(r *gin.Engine) {
 	r.PUT("/inventory/:id", controllers.UpdateInventory)
 	r.DELETE("/inventory/:id", controllers.DeleteInventory)
 	r.GET("/inventory", controllers.ListInventory)
-	r.GET("/inventory/query", controllers.QueryInventory)      // new
-	r.POST("/inventory/consume", controllers.ConsumeInventory) // new
+	r.GET("/inventory/query", controllers.QueryInventory)      
+	r.POST("/inventory/consume", controllers.ConsumeInventory) 
 
 	// --- Webhooks ---
 	r.POST("/webhooks", controllers.CreateWebhook)

@@ -23,12 +23,12 @@ func GetMongoClient(ctx context.Context) (*mongo.Client, error) {
 
 	client, err := mongo.Connect(ctx, opts)
 	if err != nil {
-		mongoLogger.Errorf("❌ Mongo Connect error: %v", err)
+		mongoLogger.Errorf(" Mongo Connect error: %v", err)
 		return nil, err
 	}
 
 	if err := client.Ping(ctx, nil); err != nil {
-		mongoLogger.Errorf("❌ Mongo Ping error: %v", err)
+		mongoLogger.Errorf(" Mongo Ping error: %v", err)
 		return nil, err
 	}
 
@@ -50,7 +50,7 @@ func GetOrdersCollection(ctx context.Context) (*mongo.Collection, error) {
 func SaveOrder(ctx context.Context, o *model.Order) error {
 	coll, err := GetOrdersCollection(ctx)
 	if err != nil {
-		mongoLogger.Errorf("❌ Failed to get orders collection: %v", err)
+		mongoLogger.Errorf(" Failed to get orders collection: %v", err)
 		return err
 	}
 
@@ -60,11 +60,11 @@ func SaveOrder(ctx context.Context, o *model.Order) error {
 
 	_, err = coll.InsertOne(ctx, o)
 	if err != nil {
-		mongoLogger.Errorf("❌ Mongo InsertOne error: %v", err)
+		mongoLogger.Errorf(" Mongo InsertOne error: %v", err)
 		return err
 	}
 
-	mongoLogger.Infof("✅ Order saved: %+v", o)
+	mongoLogger.Infof(" Order saved: %+v", o)
 	return nil
 }
 

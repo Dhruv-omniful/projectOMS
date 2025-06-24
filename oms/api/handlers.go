@@ -29,7 +29,7 @@ func (h *Handlers) CreateBulkOrder(c *gin.Context) {
 	}
 
 	if err := c.ShouldBindJSON(&req); err != nil {
-		log.Warnf("❌ Invalid request body: %v", err)
+		log.Warnf(" Invalid request body: %v", err)
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Invalid request: missing or bad path field",
 		})
@@ -38,7 +38,7 @@ func (h *Handlers) CreateBulkOrder(c *gin.Context) {
 
 	ctx := c.Request.Context()
 	if err := h.OrderService.ProcessCSV(ctx, req.Path); err != nil {
-		log.Errorf("❌ Failed to process CSV: %v", err)
+		log.Errorf(" Failed to process CSV: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to process CSV file",
 		})
@@ -54,12 +54,12 @@ func (h *Handlers) CreateBulkOrder(c *gin.Context) {
 func (h *Handlers) RegisterWebhook(c *gin.Context) {
 	var req model.Webhook
 	if err := c.ShouldBindJSON(&req); err != nil {
-		log.Warnf("❌ Invalid webhook request: %v", err)
+		log.Warnf(" Invalid webhook request: %v", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid payload"})
 		return
 	}
 	if err := client.SaveWebhook(c.Request.Context(), &req); err != nil {
-		log.Errorf("❌ Failed to save webhook: %v", err)
+		log.Errorf(" Failed to save webhook: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save webhook"})
 		return
 	}

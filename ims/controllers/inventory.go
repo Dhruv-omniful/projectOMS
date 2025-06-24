@@ -172,7 +172,7 @@ func ConsumeInventory(c *gin.Context) {
 		return
 	}
 
-	log.Infof("✅ Inventory updated: ID=%d New Quantity=%d", inventory.ID, newQty)
+	log.Infof(" Inventory updated: ID=%d New Quantity=%d", inventory.ID, newQty)
 
 	c.JSON(http.StatusOK, gin.H{
 		"message":   "Inventory consumed",

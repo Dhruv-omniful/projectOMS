@@ -35,14 +35,14 @@ func main() {
 	// === LOGGER ===
 	lvl := config.GetString(ctx, "log.level")
 	log.SetLevel(lvl)
-	log.Infof("🚀 Starting OMS on port %d", config.GetInt(ctx, "server.port"))
+	log.Infof(" Starting OMS on port %d", config.GetInt(ctx, "server.port"))
 
 	// === S3 CLIENT ===
 	s3Client, err := client.NewS3Client(ctx)
 	if err != nil {
-		log.Panicf("❌ Failed to initialize S3 client: %v", err)
+		log.Panicf(" Failed to initialize S3 client: %v", err)
 	}
-	log.Info("✅ S3 client initialized successfully")
+	log.Info(" S3 client initialized successfully")
 
 	fmt.Println("AWS_ACCESS_KEY_ID:", os.Getenv("AWS_ACCESS_KEY_ID"))
 	fmt.Println("AWS_SECRET_ACCESS_KEY:", os.Getenv("AWS_SECRET_ACCESS_KEY"))
@@ -51,13 +51,13 @@ func main() {
 	// === SQS CLIENT ===
 	sqsClient, err := client.NewSQSClient(ctx)
 	if err != nil {
-		log.Panicf("❌ Failed to initialize SQS client: %v", err)
+		log.Panicf(" Failed to initialize SQS client: %v", err)
 	}
-	log.Info("✅ SQS client initialized successfully")
+	log.Info(" SQS client initialized successfully")
 
 	// === KAFKA PRODUCER ===
 	client.InitKafkaProducer(ctx)
-	log.Info("✅ Kafka producer initialized successfully")
+	log.Info(" Kafka producer initialized successfully")
 
 	// === IMS CLIENT SETUP ===
 
@@ -68,12 +68,12 @@ func main() {
 	// 	commonsHttp.WithTimeout(5*time.Second),
 	// )
 	// if err != nil {
-	// 	log.Panicf("❌ Failed to init IMS HTTP client: %v", err)
+	// 	log.Panicf(" Failed to init IMS HTTP client: %v", err)
 	// }
 
 	imsClient := client.NewIMSClient(config.GetString(ctx, "ims.base_url"))
 
-	log.Info("✅ IMS client initialized successfully")
+	log.Info(" IMS client initialized successfully")
 
 	// === KAFKA CONSUMER (Order Finalizer Worker) ===
 	go worker.StartOrderFinalizer(ctx)

@@ -14,7 +14,7 @@ func StartCSVProcessor(ctx context.Context, imsClient *client.IMSClient) {
 	logger := log.DefaultLogger()
 
 	queueURL := config.GetString(ctx, "sqs.bulk_order_queue_url")
-	logger.Infof("📥 Listening for SQS messages on %s", queueURL)
+	logger.Infof(" Listening for SQS messages on %s", queueURL)
 
 	qName := path.Base(queueURL)
 
@@ -26,7 +26,7 @@ func StartCSVProcessor(ctx context.Context, imsClient *client.IMSClient) {
 
 	qObj, err := sqs.NewStandardQueue(ctx, qName, sqsCfg)
 	if err != nil {
-		logger.Panicf("❌ Failed to create SQS queue: %v", err)
+		logger.Panicf(" Failed to create SQS queue: %v", err)
 	}
 
 	handler := NewQueueHandler(imsClient)
@@ -42,7 +42,7 @@ func StartCSVProcessor(ctx context.Context, imsClient *client.IMSClient) {
 		false,
 	)
 	if err != nil {
-		logger.Panicf("❌ Failed to start SQS consumer: %v", err)
+		logger.Panicf(" Failed to start SQS consumer: %v", err)
 	}
 
 	consumer.Start(ctx)
