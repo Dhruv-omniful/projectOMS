@@ -25,7 +25,7 @@ func (h *OrderCreatedHandler) Process(ctx context.Context, msg *pubsub.Message) 
 	}
 
 	logger := log.DefaultLogger()
-	logger.Infof("📥 Processing order.created for OrderID: %s", event.OrderID)
+	logger.Infof(" Processing order.created for OrderID: %s", event.OrderID)
 
 	baseURL := config.GetString(ctx, "ims.base_url")
 	timeout := config.GetDuration(ctx, "ims.timeout")
@@ -55,7 +55,7 @@ func (h *OrderCreatedHandler) Process(ctx context.Context, msg *pubsub.Message) 
 			logger.Errorf(" Failed to update order status: %v", err)
 			return err
 		}
-		logger.Infof("✅ Order %s finalized as new_order", event.OrderID)
+		logger.Infof(" Order %s finalized as new_order", event.OrderID)
 
 		// 🔔 NEW: Trigger webhook
 
@@ -89,7 +89,7 @@ func (h *OrderCreatedHandler) Process(ctx context.Context, msg *pubsub.Message) 
 			logger.Errorf(" Failed to update order status: %v", err)
 			return err
 		}
-		logger.Warnf("⚠️ Order %s kept on_hold due to insufficient inventory", event.OrderID)
+		logger.Warnf(" Order %s kept on_hold due to insufficient inventory", event.OrderID)
 	}
 
 	return nil

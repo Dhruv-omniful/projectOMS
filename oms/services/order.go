@@ -35,7 +35,7 @@ func (s *OrderService) ProcessCSV(ctx context.Context, s3Path string) error {
 		Key:    &s3Path,
 	})
 	if err != nil {
-		log.Errorf("❌ S3 HeadObject failed: %v", err)
+		log.Errorf(" S3 HeadObject failed: %v", err)
 		return fmt.Errorf("failed to validate S3 path %s: %w", s3Path, err)
 	}
 
@@ -49,12 +49,12 @@ func (s *OrderService) ProcessCSV(ctx context.Context, s3Path string) error {
 
 	data, err := json.Marshal(payload)
 	if err != nil {
-		log.Errorf("❌ Failed to marshal SQS payload: %v", err)
+		log.Errorf(" Failed to marshal SQS payload: %v", err)
 		return fmt.Errorf("failed to marshal payload: %w", err)
 	}
 
 	if err := s.SQSClient.PublishCreateBulkOrderEvent(ctx, data); err != nil {
-		log.Errorf("❌ Failed to publish SQS event: %v", err)
+		log.Errorf(" Failed to publish SQS event: %v", err)
 		return fmt.Errorf("failed to publish event to SQS: %w", err)
 	}
 

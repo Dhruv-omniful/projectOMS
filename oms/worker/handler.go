@@ -106,7 +106,7 @@ func (h *queueHandler) Process(ctx context.Context, msgs *[]sqs.Message) (err er
 			logger.Debugf(" Row content dump: %#v", row)
 
 			if len(row) < len(header) {
-				logger.Warnf("⚠️ Row %d has insufficient columns: %v", rowNum+1, row)
+				logger.Warnf(" Row %d has insufficient columns: %v", rowNum+1, row)
 				invalid = append(invalid, row)
 				continue
 			}
@@ -114,7 +114,7 @@ func (h *queueHandler) Process(ctx context.Context, msgs *[]sqs.Message) (err er
 			getVal := func(col string) string {
 				i, ok := idx[col]
 				if !ok || i >= len(row) {
-					logger.Warnf("⚠️ Missing or invalid index for column '%s' at row %d", col, rowNum+1)
+					logger.Warnf(" Missing or invalid index for column '%s' at row %d", col, rowNum+1)
 					return ""
 				}
 				return row[i]
@@ -123,7 +123,7 @@ func (h *queueHandler) Process(ctx context.Context, msgs *[]sqs.Message) (err er
 			qtyStr := getVal("quantity")
 			qty, err := strconv.Atoi(qtyStr)
 			if err != nil || qty <= 0 {
-				logger.Warnf("⚠️ Invalid quantity at row %d: %s", rowNum+1, qtyStr)
+				logger.Warnf(" Invalid quantity at row %d: %s", rowNum+1, qtyStr)
 				invalid = append(invalid, row)
 				continue
 			}
@@ -139,14 +139,14 @@ func (h *queueHandler) Process(ctx context.Context, msgs *[]sqs.Message) (err er
 
 			logger.Debugf(" Calling CheckSKU on %s", skuID)
 			isValidSKU := h.IMS.CheckSKU(ctx, skuID)
-			logger.Debugf("✅ CheckSKU(%s) -> %v", skuID, isValidSKU)
+			logger.Debugf(" CheckSKU(%s) -> %v", skuID, isValidSKU)
 
 			logger.Debugf(" Calling CheckHub on %s", hubID)
 			isValidHub := h.IMS.CheckHub(ctx, hubID)
-			logger.Debugf("✅ CheckHub(%s) -> %v", hubID, isValidHub)
+			logger.Debugf(" CheckHub(%s) -> %v", hubID, isValidHub)
 
 			if !isValidSKU || !isValidHub {
-				logger.Warnf("⚠️ Invalid SKU or Hub at row %d: SKU=%s Hub=%s", rowNum+1, skuID, hubID)
+				logger.Warnf(" Invalid SKU or Hub at row %d: SKU=%s Hub=%s", rowNum+1, skuID, hubID)
 				invalid = append(invalid, row)
 				continue
 			}
@@ -160,7 +160,7 @@ func (h *queueHandler) Process(ctx context.Context, msgs *[]sqs.Message) (err er
 			}
 			logger.Debugf(" Attempting to save order: %+v", order)
 			if err := client.SaveOrder(ctx, order); err != nil {
-				logger.Errorf("❌ Failed to save order at row %d: %v", rowNum+1, err)
+				logger.Errorf(" Failed to save order at row %d: %v", rowNum+1, err)
 				invalid = append(invalid, row)
 				continue
 			}
@@ -171,7 +171,7 @@ func (h *queueHandler) Process(ctx context.Context, msgs *[]sqs.Message) (err er
 		}
 
 		if len(invalid) > 0 {
-			logger.Warnf("⚠️ Found %d invalid rows, uploading to S3", len(invalid))
+			logger.Warnf(" Found %d invalid rows, uploading to S3", len(invalid))
 			buf := &bytes.Buffer{}
 			w := csv.NewWriter(buf)
 			w.Write(header)
@@ -188,7 +188,7 @@ func (h *queueHandler) Process(ctx context.Context, msgs *[]sqs.Message) (err er
 			if err != nil {
 				logger.Errorf(" Failed to upload invalid CSV: %v", err)
 			} else {
-				logger.Infof("⚠️ Invalid rows saved to: s3://%s/%s", evt.Bucket, errKey)
+				logger.Infof(" Invalid rows saved to: s3://%s/%s", evt.Bucket, errKey)
 			}
 		}
 	}

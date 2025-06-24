@@ -19,7 +19,7 @@ func (h *Handlers) UploadLocalCSVs(c *gin.Context) {
 	// 2) Get list of *.csv files
 	files, err := filepath.Glob(filepath.Join(localFolder, "*.csv"))
 	if err != nil {
-		log.Errorf("❌ Failed to list local CSVs: %v", err)
+		log.Errorf(" Failed to list local CSVs: %v", err)
 		c.JSON(500, gin.H{"error": "Failed to read local folder"})
 		return
 	}
@@ -44,13 +44,13 @@ func (h *Handlers) UploadLocalCSVs(c *gin.Context) {
 
 		f, err := os.Open(filePath)
 		if err != nil {
-			log.Warnf("⚠️ Could not open %s: %v", fileName, err)
+			log.Warnf(" Could not open %s: %v", fileName, err)
 			failed = append(failed, fileName)
 			continue
 		}
 		defer f.Close()
-		log.Infof("🔼 Uploading file: local=%s → s3_key=%s", filePath, key)
-		log.Infof("📦 Uploading to bucket: %s", bucket)
+		log.Infof(" Uploading file: local=%s → s3_key=%s", filePath, key)
+		log.Infof(" Uploading to bucket: %s", bucket)
 
 		// Upload to S3
 		_, err = s3Client.PutObject(c.Request.Context(), &s3.PutObjectInput{
@@ -59,15 +59,15 @@ func (h *Handlers) UploadLocalCSVs(c *gin.Context) {
 			Body:   f,
 		})
 		if err != nil {
-			log.Warnf("❌ Upload failed for %s: %v", fileName, err)
+			log.Warnf(" Upload failed for %s: %v", fileName, err)
 			failed = append(failed, fileName)
 			continue
 		}
-		log.Infof("✅ Uploaded to S3: %s", key)
+		log.Infof(" Uploaded to S3: %s", key)
 
 		// Validate using OrderService
 		if err := h.OrderService.ProcessCSV(c.Request.Context(), key); err != nil {
-			log.Warnf("❌ Validation failed for %s: %v", fileName, err)
+			log.Warnf(" Validation failed for %s: %v", fileName, err)
 			failed = append(failed, fileName)
 			continue
 		}

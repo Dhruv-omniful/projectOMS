@@ -39,7 +39,7 @@ func NewS3Client(ctx context.Context) (*S3Client, error) {
 		)),
 	)
 	if err != nil {
-		log.Errorf("❌ AWS config load failed: %v", err)
+		log.Errorf(" AWS config load failed: %v", err)
 		return nil, err
 	}
 

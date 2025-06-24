@@ -58,7 +58,7 @@ func (c *SQSClient) PublishCreateBulkOrderEvent(ctx context.Context, payload []b
 	}
 
 	if err := c.Publisher.Publish(ctx, msg); err != nil {
-		log.DefaultLogger().Errorf("❌ SQS publish failed: %v", err)
+		log.DefaultLogger().Errorf(" SQS publish failed: %v", err)
 		return err
 	}
 
