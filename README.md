@@ -149,6 +149,29 @@ omni_project/
 │   └── main.go
 └── docker-compose.yaml   # Docker orchestration for dependencies
 ```
+## : Screenshots
+--Starting IMS on PORT 8081
+![Image](https://github.com/user-attachments/assets/6b8dc143-dec9-4e2a-9268-344cf6c03751)
+--OMS
+![Screenshot 2025-06-24 163909](https://github.com/user-attachments/assets/1a19a732-3be2-4857-b3b2-770053f57279)
+--Uploading CSV to s3
+![Image](https://github.com/user-attachments/assets/1dc08037-cf2f-4b0b-a3ba-5e963f58465e)
+--valid row(call ims api and then check hubcode and skucode, also check quantity in csv>0)
+![Image](https://github.com/user-attachments/assets/a6dd4d47-b327-4a80-9314-16b0541b80b7)
+--invalid row(if either hub/skucode mismatched or invalid inventory then move to s3://oms-bucket/errors)
+![Image](https://github.com/user-attachments/assets/93703091-9703-41ed-9395-9c190c8309dc)
+![Screenshot 2025-06-24 164804](https://github.com/user-attachments/assets/71fba16e-b1f4-45a5-8ba7-0a4541598514)
+--inventory update
+![Screenshot 2025-06-24 164557](https://github.com/user-attachments/assets/ab50bbd7-2db9-447b-a45f-e1b83134b430)
+--mongo DB
+
+![Screenshot 2025-06-24 164225](https://github.com/user-attachments/assets/fff31cbc-7349-4092-a56f-3f0bfefc1669)
+![Screenshot 2025-06-24 164349](https://github.com/user-attachments/assets/b82c23e6-ee42-47ce-9b36-a721216d6059)
+![Screenshot 2025-06-24 164928](https://github.com/user-attachments/assets/a3f2a9e4-e7f3-4b33-93d8-2cd32fc46758)
+
+--webhook
+
+![Image](https://github.com/user-attachments/assets/1cc4025d-a2e9-43d7-a6b1-571643707188)
 
 ## : Getting Started
 
