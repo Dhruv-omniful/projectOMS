@@ -113,7 +113,9 @@ func StartOrderFinalizer(ctx context.Context) {
 
 	log.DefaultLogger().Infof(" Consumer subscribing to topic: order.created")
 
-	handler := &OrderCreatedHandler{}
+	handler := &OrderCreatedHandler{
+		
+	}
 	consumer.RegisterHandler("order.created", handler)
 
 	go consumer.Subscribe(ctx)

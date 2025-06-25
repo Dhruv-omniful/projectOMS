@@ -9,14 +9,16 @@ import (
 	"github.com/omniful/go_commons/config"
 	"github.com/omniful/go_commons/env"
 	"github.com/omniful/go_commons/health"
+
 	// commonsHttp "github.com/omniful/go_commons/http"
 	"github.com/omniful/go_commons/http"
 	"github.com/omniful/go_commons/log"
+
 	// "github.com/omniful/go_commons/redis"
 
 	"github.com/dhruv/oms/api"
 	"github.com/dhruv/oms/client"
-	"github.com/dhruv/oms/services"
+	service "github.com/dhruv/oms/services"
 	"github.com/dhruv/oms/worker"
 )
 
@@ -87,6 +89,17 @@ func main() {
 	// === START WORKER ===
 	go worker.StartCSVProcessor(ctx, imsClient)
 
+	level := config.GetString(ctx, "log.level")
+	log.SetLevel(level)
+
+	logOpts := http.LoggingMiddlewareOptions{
+		Format:      config.GetString(ctx, "log.format"),
+		Level:       level,
+		LogRequest:  true,
+		LogResponse: true,
+		LogHeader:   false,
+	}
+
 	// === SERVER SETUP ===
 	port := ":" + strconv.Itoa(config.GetInt(ctx, "server.port"))
 	srv := http.InitializeServer(
@@ -97,6 +110,7 @@ func main() {
 		false,
 		env.RequestID(),
 		env.Middleware(config.GetString(ctx, "env")),
+		http.RequestLogMiddleware(logOpts),
 	)
 
 	// === ROUTES ===

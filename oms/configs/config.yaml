@@ -7,7 +7,8 @@ server:
 
 # === LOGGING ===
 log:
-  level: "info"               # Can be: debug, info, warn, error
+  format: "json"
+  level: info              # Can be: debug, info, warn, error
 
 # === ENVIRONMENT ===
 env: "local"                  # local | development | staging | production

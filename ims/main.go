@@ -38,6 +38,17 @@ func main() {
 	port := config.GetInt(ctx, "server.port")
 	log.Infof("Starting IMS server on port %d", port)
 
+	level := config.GetString(ctx, "log.level")
+	log.SetLevel(level)
+
+	logOpts := http.LoggingMiddlewareOptions{
+		Format:      config.GetString(ctx, "log.format"),
+		Level:       level,
+		LogRequest:  true,
+		LogResponse: true,
+		LogHeader:   false,
+	}
+
 	// Initialize HTTP server with common middleware
 	server := http.InitializeServer(
 		fmt.Sprintf(":%d", port),
@@ -48,6 +59,7 @@ func main() {
 		env.RequestID(),
 		env.Middleware(config.GetString(ctx, "env")),
 		config.Middleware(),
+		http.RequestLogMiddleware(logOpts),
 	)
 
 	// Health check endpoint
