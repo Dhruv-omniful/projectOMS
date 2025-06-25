@@ -255,7 +255,7 @@ aws --endpoint-url=http://localhost:4566 sqs create-queue --queue-name CreateBul
 
 ### 8. Start IMS (Inventory Management Service)
 
-⚠️ Run this in a **new terminal** and keep it running.
+ Run this in a **new terminal** and keep it running.
 
 ```powershell
 cd ./ims
@@ -266,7 +266,7 @@ go run main.go
 
 ### 9. Start OMS (Order Management Service)
 
-⚠️ Run this in another **new terminal** and keep it running.
+ Run this in another **new terminal** and keep it running.
 
 ```powershell
 # Navigate to the project directory first
